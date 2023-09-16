@@ -57,24 +57,69 @@ def spider_entire_website(driver: webdriver.Chrome, url: str, xpath: str, ignore
             spider_entire_website(driver, element_href, xpath, ignored_paths, visited_paths)
 
 
-def extract_house_information(driver, house):
+def extract_house_information(driver, house_href):
+    driver.get(house_href)
     # Get all relevant information from the house
-    property_title = driver.find_element(By.CLASS_NAME, 'property-title')
-    property_price = driver.find_element(By.CLASS_NAME, 'property-price').get_attribute('span')
-    property_list_title = driver.find_element(By.CLASS_NAME, 'property-list-title')
-    property_mapview = driver.find_element(By.CLASS_NAME, 'property-mapview')
-    property_features = driver.find_elements(By.CLASS_NAME, 'property-features')
-    detail_info_description_txt = driver.find_element(By.CLASS_NAME, 'detail-info-description-txt')
+    try:
+        property_title = driver.find_element(By.CLASS_NAME, 'property-title').text
+    except:
+        property_title = ''
 
-    # Transform the information
-    # TODO
+    print(property_title)
+
+    try:
+        property_price = driver.find_element(By.CLASS_NAME, 'property-price').text
+    except:
+        property_price = ''
+
+    print(property_price)
+
+    try:
+        property_list_title = driver.find_element(By.CLASS_NAME, 'property-list-title').text
+    except:
+        property_list_title = ''
+
+    print(property_list_title)
+
+    try:
+        property_features = driver.find_elements(By.CLASS_NAME, 'property-features')
+        property_features = [property_feature.text for property_feature in property_features]
+    except:
+        property_features = []
+
+    
+    print(property_features)
+
+    try:
+        property_features_highlights = driver.find_element(By.CLASS_NAME, 'property-features highlights')
+        property_features_highlights = [highlight.text for highlight in property_features_highlights]
+    except:
+        property_features_highlights = []
+
+    
+    print(property_features_highlights)
+
+    try:
+        detail_info_description_txt = driver.find_element(By.CLASS_NAME, 'detail-info-description-txt').text
+    except:
+        detail_info_description_txt = ''
+
+    print(detail_info_description_txt)
+
+    # TODO: Get detail-info-features-list class information
     
     # Save the information into a dictionary
-    # TODO
+    house_information = {
+        'Link': house_href,
+        'Title': property_title,
+        'Price': property_price,
+        'Location': property_list_title,
+        'Features': property_features,
+        'Highlights': property_features_highlights,
+        'Description text': detail_info_description_txt
+    }
 
-    # Return the dictionary
-    # TODO
-    return None
+    return house_information
 
 
 def spider_specific_house_locations(driver, url, house_location_list, current_page):
@@ -87,10 +132,16 @@ def spider_specific_house_locations(driver, url, house_location_list, current_pa
 
     print(houses_hrefs)
     # Get relevant information of all the houses found
-    # TODO
-    for house in houses_hrefs:
-        house_dict = extract_house_information(driver, house)
+    for house_href in houses_hrefs:
+        house_dict = extract_house_information(driver, house_href)
 
+        # Send the house dict through Kafka
+        # TODO Start Kafka Producer 
+        
+
+    # Setup the same url again 
+    driver.get(url)
+    # Get next page
     next_page_url = driver.find_element(By.CLASS_NAME, 'list-pagination-next').get_attribute('href')
     print(next_page_url)
     spider_specific_house_locations(driver, next_page_url, house_location_list, current_page+1)
@@ -115,29 +166,14 @@ def testing_webcrawling():
     # print(JDCookieNotifier_element)
     visited_paths = []
 
-    # ! ####################################################################################################
-    # ! Problem: Takes an imense amount of time to crawl the entire website and to find out the pages with 
+    # ! ############################################################################################################
+    # ! Problem: Takes an extremely large amount of time to crawl the entire website and to find out the pages with 
     # ! the relevant information
     # !
     # ! spider_entire_website(driver, base_url, "//a[@href]", config['ignored_paths'], visited_paths)
-    # ! ####################################################################################################
+    # ! ############################################################################################################
     
     spider_specific_house_locations(driver, base_url, config['house_location_list'], 1)
 
-    # header = driver.find_elements(By.TAG_NAME, "head")
-    # # print(header[0].get_attribute('innerHTML'))
-
-    # # start from your target element, here for example, "header"
-    # all_children_by_css = header[0].find_elements(By.CSS_SELECTOR, "*")
-    # all_children_by_xpath = header[0].find_elements(By.XPATH, ".//*")
-    # print('len(all_children_by_css): ' + str(len(all_children_by_css)))
-    # print('len(all_children_by_xpath): ' + str(len(all_children_by_xpath)))
-
-    # for child in all_children_by_xpath:
-    #     print(child.get_attribute('innerHTML'))
-    #     print(child.find_elements(By.XPATH, ".//*"))
-    #     # print(child.find_elements(By.CSS_SELECTOR, ".//*"))
-
-    # wrapper = body.find_elements(By.ID, "wrapper")
     driver.quit()
 

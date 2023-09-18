@@ -1,11 +1,11 @@
 import os.path
 
-from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 
-from config import load_config
+from config import ignored_paths, house_location_list
 
 ## Setup chrome options
 chrome_options = Options()
@@ -136,7 +136,7 @@ def spider_specific_house_locations(driver, url, house_location_list, current_pa
         house_dict = extract_house_information(driver, house_href)
 
         # Send the house dict through Kafka
-        # TODO Start Kafka Producer 
+        # TODO Start Kafka Producer and send messages to be consumed by the Consumer 
         
 
     # Setup the same url again 
@@ -148,14 +148,11 @@ def spider_specific_house_locations(driver, url, house_location_list, current_pa
 
 
 
-def testing_webcrawling():
-    # url = 'https://www.idealista.pt/imovel/31687430'
+def web_crawler():
     # step 1: web crawl supercasa.pt website
     # step 2: get all the links that are related to real state
     # step 3: extract relevant information
     base_url = 'https://supercasa.pt/comprar-casas/aveiro-distrito'
-
-    config = load_config('supercasa')
 
     driver = webdriver.Chrome(options=chrome_options)
     driver.implicitly_wait(10)
@@ -173,7 +170,7 @@ def testing_webcrawling():
     # ! spider_entire_website(driver, base_url, "//a[@href]", config['ignored_paths'], visited_paths)
     # ! ############################################################################################################
     
-    spider_specific_house_locations(driver, base_url, config['house_location_list'], 1)
+    spider_specific_house_locations(driver, base_url, house_location_list, 1)
 
     driver.quit()
 

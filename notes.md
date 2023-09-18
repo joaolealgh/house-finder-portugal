@@ -12,5 +12,8 @@
     - Confluent Kafka Python
 
     1. The lib to use will be confluent kafka due to being maintained by confluent and being faster than the other libraries.
+        - Problems with the confluence kafka
+            - The current machine doesn't handle the amount of memory and cpu resources that is needed to run smoothly. And since the objective is to use kubernetes to deploy all the services/applications, a change must be made. The original kafka will be used.
+            - Instructions followed to deploy CFK (https://docs.confluent.io/operator/current/co-quickstart.html#)
 
 3.  

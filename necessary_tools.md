@@ -53,14 +53,6 @@ To start k9s run:
 
 4. Kafka
 
-- Using kafka confluence and json serializers to pass information between the Producer(Web crawler/Web scraper) and the Consumer(Pyspark node), it is necessary to setup multiple tools:
-    - Kafka (confluent-kafka/docker-compose.yaml)
-    - Schema registry (on premises)
-    - Producer
-    - Consumer
+https://dzone.com/articles/how-to-deploy-apache-kafka-with-kubernetes
 
-start the Kafka broker:
-`docker compose up -d`
-
-`curl -sL --http1.1 https://cnfl.io/cli | sh -s -- latest`
-
+kubectl apply -k ./

@@ -64,6 +64,9 @@ Currently it is needed to Port forward kafka-broker to localhost:9092 -> change 
 
 Check why kafka ui isnt connecting to the broker: https://github.com/provectus/kafka-ui
 
-Change the spark images to official images
+Change the spark images to official images: https://github.com/kubernetes/examples/tree/master/staging/spark
 
-
+Verify best way to deploy a postgres cluster in kubernetes (without replication, not necessary in this types of project)
+- https://kodekloud.com/blog/deploy-postgresql-kubernetes/#setting-up-a-kubernetes-cluster
+- https://www.sumologic.com/blog/kubernetes-deploy-postgres/
+- https://github.com/reactive-tech/kubegres

@@ -4,6 +4,7 @@ from selenium.common.exceptions import StaleElementReferenceException, NoSuchEle
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from kafka_producer import start_producer, send_json_message
 
 from config import ignored_paths, house_location_list
 
@@ -122,7 +123,7 @@ def extract_house_information(driver, house_href):
     return house_information
 
 
-def spider_specific_house_locations(driver, url, house_location_list, current_page):
+def spider_specific_house_locations(producer, driver, url, house_location_list, current_page):
     # * Use pagination the click function of selenium to click on the next page (the website must use pagination)
     # * Access only the div that contains the list with the relevant links to the houses
     # *
@@ -136,15 +137,16 @@ def spider_specific_house_locations(driver, url, house_location_list, current_pa
         house_dict = extract_house_information(driver, house_href)
 
         # Send the house dict through Kafka
-        # TODO Start Kafka Producer and send messages to be consumed by the Consumer 
-        
+        # TODO Start Kafka Producer and send messages to be consumed by the Consumer
+        topic = 'supercasa_houses'
+        send_json_message(producer, topic, house_dict)
 
     # Setup the same url again 
     driver.get(url)
     # Get next page
     next_page_url = driver.find_element(By.CLASS_NAME, 'list-pagination-next').get_attribute('href')
     print(next_page_url)
-    spider_specific_house_locations(driver, next_page_url, house_location_list, current_page+1)
+    spider_specific_house_locations(producer, driver, next_page_url, house_location_list, current_page+1)
 
 
 
@@ -163,14 +165,10 @@ def web_crawler():
     # print(JDCookieNotifier_element)
     visited_paths = []
 
-    # ! ############################################################################################################
-    # ! Problem: Takes an extremely large amount of time to crawl the entire website and to find out the pages with 
-    # ! the relevant information
-    # !
-    # ! spider_entire_website(driver, base_url, "//a[@href]", config['ignored_paths'], visited_paths)
-    # ! ############################################################################################################
-    
-    spider_specific_house_locations(driver, base_url, house_location_list, 1)
+    # Start Kafka Producer
+    producer = start_producer()
+
+    spider_specific_house_locations(producer, driver, base_url, house_location_list, 1)
 
     driver.quit()
 

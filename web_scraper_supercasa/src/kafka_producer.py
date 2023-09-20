@@ -5,8 +5,7 @@ import logging
 from kafka import KafkaProducer
 from kafka.errors import KafkaError
 
-# TODO Make a class with Producer
-
+# TODO Make a class with Producer    
 
 def on_send_success(record_metadata):
     print(record_metadata.topic)
@@ -19,12 +18,13 @@ def on_send_error(excp):
     # TODO
 
 def start_producer(bootstrap_servers=['localhost:9092']):
-    # produce json messages
-    producer = KafkaProducer(bootstrap_servers=bootstrap_servers, 
-                            value_serializer=lambda m: json.dumps(m).encode('utf-8'))
-    
+    producer = KafkaProducer(bootstrap_servers=bootstrap_servers)
     return producer
 
+def serialize_message(message: dict):
+    return json.dumps(message).encode('utf-8')
+
 def send_json_message(producer: KafkaProducer, topic: str, message: dict):
+    message = serialize_message(message)
     producer.send(topic, message).add_callback(on_send_success).add_errback(on_send_error)
     # producer.flush()

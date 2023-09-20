@@ -56,3 +56,14 @@ To start k9s run:
 https://dzone.com/articles/how-to-deploy-apache-kafka-with-kubernetes
 
 kubectl apply -k ./
+
+
+add `127.0.0.1	kafka-broker` to /etc/hosts
+
+Currently it is needed to Port forward kafka-broker to localhost:9092 -> change this in the future
+
+Check why kafka ui isnt connecting to the broker: https://github.com/provectus/kafka-ui
+
+Change the spark images to official images
+
+

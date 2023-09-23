@@ -6,6 +6,7 @@ from pyspark.sql.functions import from_json,col
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s:%(funcName)s:%(levelname)s:%(message)s')
+
 logger = logging.getLogger("spark_structured_streaming")
 
 def create_initial_session():

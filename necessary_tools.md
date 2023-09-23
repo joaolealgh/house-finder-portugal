@@ -66,7 +66,28 @@ Check why kafka ui isnt connecting to the broker: https://github.com/provectus/k
 
 Change the spark images to official images: https://github.com/kubernetes/examples/tree/master/staging/spark
 
+kubectl apply -k ./ --namespace=spark-cluster
+
+Run minikube tunnel to be able to connect to spark-ui-proxy in: http://localhost/proxy:spark-master:8080
+
 Verify best way to deploy a postgres cluster in kubernetes (without replication, not necessary in this types of project)
-- https://kodekloud.com/blog/deploy-postgresql-kubernetes/#setting-up-a-kubernetes-cluster
+- https://kodekloud.com/blog/deploy-postgresql-kubernetes/#setting-up-a-kubernetes-cluster 
 - https://www.sumologic.com/blog/kubernetes-deploy-postgres/
-- https://github.com/reactive-tech/kubegres
+- https://github.com/reactive-tech/kubegres -> too much fluff, unecessary replication for a local development
+- https://gist.github.com/ivanbrennan/cf20e26de6e7cbf517d101e7cc9d4ca0
+
+https://trello.com/b/d8Ki5pCN/house-finder-project
+
+Test the connection as followed:
+https://gist.github.com/ivanbrennan/cf20e26de6e7cbf517d101e7cc9d4ca0
+
+# test the connection from within the cluster
+url=$(kubectl --context=minikube get service postgres \
+              --output=jsonpath='{.spec.clusterIP}:{.spec.ports[0].port}')
+kubectl --context=minikube run pgbox --image=postgres:9.6 \
+    --rm -it --restart=Never -- \
+    bash -c "read &&
+             psql --host=${url%:*} --port=${url#*:} \
+                  --username=postgres --dbname=postgres \
+                  --command='SELECT refobjid FROM pg_depend LIMIT 1'"
+

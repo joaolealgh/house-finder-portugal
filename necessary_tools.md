@@ -50,6 +50,7 @@ To start k9s run:
 
 3. Python >=3.8
 
+---
 
 4. Kafka
 
@@ -90,4 +91,32 @@ kubectl --context=minikube run pgbox --image=postgres:9.6 \
              psql --host=${url%:*} --port=${url#*:} \
                   --username=postgres --dbname=postgres \
                   --command='SELECT refobjid FROM pg_depend LIMIT 1'"
+
+# Connect to the postgres cluster using port forward and psql
+
+1. Port forward using the k9s or `kubectl port-forward pod/postgresql-0 5432:5432`
+
+2. `psql --host localhost --username postgres`
+
+# Create a database and the tables in the postgres cluster
+
+create-db-job.yaml inside /postgresql/manifests/
+
+# Connect to the database using DBeaver
+1. Port forward 
+2. Connect to dbeaver using the correct url and credentials
+
+# Install driver inside the pyspark cluster
+1. Enter the shell of spark-master pod
+2. cd jars
+3. Download jdbc driver: `curl -O -k https://jdbc.postgresql.org/download/postgresql-42.6.0.jar`
+4. Download Kafka driver: `curl -O -k https://repo1.maven.org/maven2/org/apache/spark/spark-sql-kafka-0-10_2.12/3.3.0/spark-sql-kafka-0-10_2.12-3.3.0.jar`
+5. Download kafka client: `curl -O -k https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/3.3.0/kafka-clients-3.3.0.jar`
+# Copy pyspark.py to spark master container to test the script using spark-submit
+`kubectl cp projects/house-finder-portugal/pyspark/src/batching_data.py default/spark-master-8d545cb67-j2xbr:batching_data.py`
+
+# Test the script
+`spark/bin/spark-submit --jars spark/jars/kafka-clients-3.3.0.jar batching_data.py`
+
+https://github.com/big-data-europe/docker-spark/tree/master/template/python
 

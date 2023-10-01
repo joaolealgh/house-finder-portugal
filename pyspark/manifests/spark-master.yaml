@@ -38,8 +38,22 @@ spec:
       containers:
       - name: spark-master
         image: bde2020/spark-master:3.3.0-hadoop3.3
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
         - containerPort: 7077
         - containerPort: 6066
+        command: ["/bin/sh"]
+        args:
+          - -c
+          - >-
+              cd spark/jars &&
+              curl -O -k https://jdbc.postgresql.org/download/postgresql-42.6.0.jar &&
+              curl -O -k https://repo1.maven.org/maven2/org/apache/spark/spark-sql-kafka-0-10_2.12/3.3.0/spark-sql-kafka-0-10_2.12-3.3.0.jar &&
+              curl -O -k https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/3.3.0/kafka-clients-3.3.0.jar &&
+              curl -O -k https://repo1.maven.org/maven2/org/apache/commons/commons-pool2/2.8.0/commons-pool2-2.8.0.jar &&
+              curl -O -k https://repo1.maven.org/maven2/org/apache/spark/spark-token-provider-kafka-0-10_2.12/3.0.0-preview2/spark-token-provider-kafka-0-10_2.12-3.0.0-preview2.jar &&
+              cd ../.. &&
+              chmod +x master.sh && 
+              ./master.sh
+              

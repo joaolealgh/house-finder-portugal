@@ -77,7 +77,7 @@ Verify best way to deploy a postgres cluster in kubernetes (without replication,
 - https://github.com/reactive-tech/kubegres -> too much fluff, unecessary replication for a local development
 - https://gist.github.com/ivanbrennan/cf20e26de6e7cbf517d101e7cc9d4ca0
 
-https://trello.com/b/d8Ki5pCN/house-finder-project
+Trello: https://trello.com/b/d8Ki5pCN/house-finder-project
 
 Test the connection as followed:
 https://gist.github.com/ivanbrennan/cf20e26de6e7cbf517d101e7cc9d4ca0
@@ -106,17 +106,43 @@ create-db-job.yaml inside /postgresql/manifests/
 1. Port forward 
 2. Connect to dbeaver using the correct url and credentials
 
-# Install driver inside the pyspark cluster
-1. Enter the shell of spark-master pod
-2. cd jars
-3. Download jdbc driver: `curl -O -k https://jdbc.postgresql.org/download/postgresql-42.6.0.jar`
-4. Download Kafka driver: `curl -O -k https://repo1.maven.org/maven2/org/apache/spark/spark-sql-kafka-0-10_2.12/3.3.0/spark-sql-kafka-0-10_2.12-3.3.0.jar`
-5. Download kafka client: `curl -O -k https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/3.3.0/kafka-clients-3.3.0.jar`
 # Copy pyspark.py to spark master container to test the script using spark-submit
 `kubectl cp projects/house-finder-portugal/pyspark/src/batching_data.py default/spark-master-8d545cb67-j2xbr:batching_data.py`
 
 # Test the script
 `spark/bin/spark-submit --jars spark/jars/kafka-clients-3.3.0.jar batching_data.py`
+`spark/bin/spark-submit batching_data.py` -> if the jars are already on the config in the consumer
 
 https://github.com/big-data-europe/docker-spark/tree/master/template/python
 
+kafka ui local:
+https://gist.github.com/ashishmaurya/e192cdf44fdeeb459f0bfa09877dee22
+
+How to deploy applications with spark submit: 
+https://github.com/big-data-europe/docker-spark#kubernetes-deployment
+
+Run spark shell:
+`kubectl run spark-base --rm -it --labels="app=spark-client" --image bde2020/spark-base:3.3.0-hadoop3.3 -- bash ./spark/bin/spark-shell --master spark://spark-master:7077 --conf spark.driver.host=spark-client`
+
+Run spark submit:
+With class:
+`kubectl run spark-base --rm -it --labels="app=spark-client" --image bde2020/spark-base:3.3.0-hadoop3.3 -- bash ./spark/bin/spark-submit --class CLASS_TO_RUN --master spark://spark-master:7077 --deploy-mode client --conf spark.driver.host=spark-client URL_TO_YOUR_APP`
+
+Without class:
+`kubectl run spark-base --rm -it --labels="app=spark-client" --image bde2020/spark-base:3.3.0-hadoop3.3 -- bash ./spark/bin/spark-submit --master spark://spark-master:7077 --deploy-mode client --conf spark.driver.host=spark-client URL_TO_YOUR_APP`
+
+Spark with airflow: https://medium.com/swlh/using-airflow-to-schedule-spark-jobs-811becf3a960
+
+
+(To do):
+https://medium.com/go-city/deploying-apache-airflow-on-kubernetes-for-local-development-8e958675585d
+
+Currently, using the helm chart of airflow to test if everything works well with spark:
+https://airflow.apache.org/docs/helm-chart/stable/index.html
+
+Installing the chart:
+`helm repo add apache-airflow https://airflow.apache.org`
+`helm upgrade --install airflow apache-airflow/airflow --namespace airflow --create-namespace`
+
+Uninstalling the chart:
+`helm delete airflow --namespace airflow`

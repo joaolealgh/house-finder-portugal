@@ -16,4 +16,6 @@
             - The current machine doesn't handle the amount of memory and cpu resources that is needed to run smoothly. And since the objective is to use kubernetes to deploy all the services/applications, a change must be made. The original kafka will be used.
             - Instructions followed to deploy CFK (https://docs.confluent.io/operator/current/co-quickstart.html#)
 
-3.  
+3.  Spark
+    1. https://github.com/bitnami/charts/tree/main/bitnami/spark -> Uses helm chart 
+    2. https://github.com/big-data-europe/docker-spark -> Doesnt use helm chart
